@@ -71,23 +71,21 @@ struct WindowShownPayload {
     should_focus_search: bool,
 }
 
-fn is_wayland_session() -> bool {
+fn should_focus_search() -> bool {
     #[cfg(target_os = "linux")]
     {
-        std::env::var("XDG_SESSION_TYPE")
-            .map(|v| v.eq_ignore_ascii_case("wayland"))
-            .unwrap_or(false)
+        false
     }
 
     #[cfg(not(target_os = "linux"))]
     {
-        false
+        true
     }
 }
 
 pub fn do_show(app: &AppHandle) -> Result<(), String> {
     let win = main_window(app)?;
-    let should_focus_search = !is_wayland_session();
+    let should_focus_search = should_focus_search();
 
     position_at_cursor(&win);
     win.set_always_on_top(true).map_err(|e| e.to_string())?;
@@ -155,23 +153,12 @@ fn simulate_paste() {
     #[cfg(target_os = "linux")]
     {
         use std::process::Command;
-        let is_wayland = std::env::var("XDG_SESSION_TYPE")
-            .map(|v| v.to_lowercase() == "wayland")
-            .unwrap_or(false);
 
-        let result = if is_wayland {
-            Command::new("wtype")
-                .args(["-M", "ctrl", "-k", "v", "-m", "ctrl"])
-                .status()
-        } else {
-            Command::new("xdotool")
-                .args(["key", "--clearmodifiers", "ctrl+v"])
-                .status()
-        };
-
-        if let Err(e) = result {
-            let tool = if is_wayland { "wtype" } else { "xdotool" };
-            eprintln!("[paste] failed to run {tool}: {e}");
+        if let Err(e) = Command::new("wtype")
+            .args(["-M", "ctrl", "-k", "v", "-m", "ctrl"])
+            .status()
+        {
+            eprintln!("[paste] failed to run wtype: {e}");
         }
     }
 

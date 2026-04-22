@@ -45,15 +45,7 @@ sudo dpkg -i vcm-linux.deb
 
 ### System Dependencies
 
-For auto-paste to work, install the appropriate tool:
-
-**X11:**
-
-```bash
-sudo apt install -y xdotool
-```
-
-**Wayland:**
+For auto-paste on Linux, install:
 
 ```bash
 sudo apt install -y wtype
@@ -67,7 +59,7 @@ sudo apt install -y \
   libgtk-3-dev \
   libappindicator3-dev \
   librsvg2-dev \
-  xdotool
+  wtype
 
 cargo install tauri-cli --version "^2"
 cargo tauri build

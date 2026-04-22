@@ -10,7 +10,7 @@ A fast, cross-platform clipboard manager with a GUI popup and CLI tool. Built wi
 - **Image preview** — clipboard images shown as thumbnails
 - **Configurable shortcut** — set any global hotkey from UI or CLI
 - **CLI support** — push, pop, list, clear, and configure from the terminal
-- **Cross-platform** — Linux (X11 + Wayland), macOS, and Windows
+- **Cross-platform** — Linux (Wayland), macOS, and Windows
 - **Dark / Light theme** — toggle in settings, persisted across sessions
 - **Auto-paste** — selecting an item writes to clipboard and simulates paste
 - **System tray** — runs in the background with a tray icon
@@ -165,8 +165,7 @@ This builds for Linux, macOS, and Windows, and creates a GitHub Release with:
 - [Rust](https://rustup.rs/) (stable)
 - [Node.js](https://nodejs.org/) (for Tauri CLI)
 - Tauri CLI: `cargo install tauri-cli --version "^2"`
-- **Linux**: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `libappindicator3-dev`, `xdotool`
-- **Linux (Wayland)**: `wtype`
+- **Linux (Wayland)**: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `libappindicator3-dev`, `wtype`
 
 ### Run in development
 
@@ -233,8 +232,7 @@ The `gui` feature flag controls Tauri-dependent code. The CLI compiles with `--n
 ## Platform Notes
 
 ### Linux
-- **X11**: Uses `xdotool` for window focus and paste simulation
-- **Wayland**: Falls back to `wtype` for paste simulation
+- **Wayland only**: Uses `wtype` for paste simulation
 - Autostart: `~/.config/autostart/vibes-copy-manager.desktop`
 
 ### macOS
