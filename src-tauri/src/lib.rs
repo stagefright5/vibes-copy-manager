@@ -191,6 +191,7 @@ fn set_config(app: tauri::AppHandle, cfg: config::AppConfig) -> Result<(), Strin
             }
         })
         .map_err(|e| e.to_string())?;
+        gs.register(new_shortcut).map_err(|e| e.to_string())?;
     } else {
         let gs = app.global_shortcut();
         gs.unregister_all().map_err(|e| e.to_string())?;

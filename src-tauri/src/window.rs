@@ -1,3 +1,4 @@
+use serde::Serialize;
 use std::thread;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition};
@@ -64,43 +65,44 @@ fn position_at_cursor(win: &tauri::WebviewWindow) {
     let _ = win.set_position(PhysicalPosition::new(x, y));
 }
 
-/// Force-activate our window on X11 via xdotool (Linux only, no-op elsewhere).
-fn platform_force_focus() {
+#[derive(Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WindowShownPayload {
+    should_focus_search: bool,
+}
+
+fn is_wayland_session() -> bool {
     #[cfg(target_os = "linux")]
     {
-        use std::process::Command;
-        let pid = std::process::id().to_string();
-        thread::spawn(move || {
-            thread::sleep(Duration::from_millis(30));
-            let wid = Command::new("xdotool")
-                .args(["search", "--pid", &pid, "--onlyvisible"])
-                .output();
-            if let Ok(output) = wid {
-                let ids = String::from_utf8_lossy(&output.stdout);
-                if let Some(id) = ids.lines().last() {
-                    let id = id.trim();
-                    if !id.is_empty() {
-                        let _ = Command::new("xdotool")
-                            .args(["windowactivate", "--sync", id])
-                            .status();
-                        let _ = Command::new("xdotool")
-                            .args(["windowfocus", "--sync", id])
-                            .status();
-                    }
-                }
-            }
-        });
+        std::env::var("XDG_SESSION_TYPE")
+            .map(|v| v.eq_ignore_ascii_case("wayland"))
+            .unwrap_or(false)
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        false
     }
 }
 
 pub fn do_show(app: &AppHandle) -> Result<(), String> {
     let win = main_window(app)?;
+    let should_focus_search = !is_wayland_session();
+
     position_at_cursor(&win);
     win.set_always_on_top(true).map_err(|e| e.to_string())?;
     win.show().map_err(|e| e.to_string())?;
-    win.set_focus().map_err(|e| e.to_string())?;
-    platform_force_focus();
-    let _ = app.emit("window-shown", ());
+
+    if should_focus_search {
+        win.set_focus().map_err(|e| e.to_string())?;
+    }
+
+    let _ = app.emit(
+        "window-shown",
+        WindowShownPayload {
+            should_focus_search,
+        },
+    );
     Ok(())
 }
 

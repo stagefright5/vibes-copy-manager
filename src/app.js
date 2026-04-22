@@ -236,7 +236,7 @@ function hideWindow() {
   }, 100);
 }
 
-function activateWindow() {
+function activateWindow(shouldFocusSearch = true) {
   selectedIndex = 0;
   searchInput.value = '';
   render();
@@ -248,14 +248,13 @@ function activateWindow() {
     });
   });
 
-  const focusInput = () => {
-    window.focus();
-    searchInput.focus();
-  };
-  focusInput();
-  setTimeout(focusInput, 50);
-  setTimeout(focusInput, 120);
-  setTimeout(focusInput, 250);
+  if (shouldFocusSearch) {
+    requestAnimationFrame(() => {
+      searchInput.focus();
+    });
+  } else {
+    searchInput.blur();
+  }
 }
 
 // ─── Rendering ───────────────────────────────────────────────────
@@ -324,6 +323,14 @@ function createItemEl(item, idx) {
     `;
   }
 
+  li.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('.pin-btn, .del-btn')) return;
+
+    e.preventDefault();
+    pasteItem(idx);
+  });
+
   li.addEventListener('click', (e) => {
     if (e.target.closest('.pin-btn')) {
       history.togglePin(item.id);
@@ -331,9 +338,7 @@ function createItemEl(item, idx) {
     }
     if (e.target.closest('.del-btn')) {
       history.removeItem(item.id);
-      return;
     }
-    pasteItem(idx);
   });
 
   return li;
@@ -528,8 +533,8 @@ themeBtns.forEach(btn => {
 
 // ─── Window Lifecycle ────────────────────────────────────────────
 
-listen('window-shown', () => {
-  activateWindow();
+listen('window-shown', (event) => {
+  activateWindow(event.payload?.shouldFocusSearch ?? true);
 });
 
 listen('open-settings', () => {
