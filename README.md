@@ -165,7 +165,7 @@ This builds for Linux, macOS, and Windows, and creates a GitHub Release with:
 - [Rust](https://rustup.rs/) (stable)
 - [Node.js](https://nodejs.org/) (for Tauri CLI)
 - Tauri CLI: `cargo install tauri-cli --version "^2"`
-- **Linux (Wayland)**: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `libappindicator3-dev`, `wtype`
+- **Linux (Wayland)**: `libwebkit2gtk-4.1-dev`, `libgtk-3-dev`, `libayatana-appindicator3-dev`, `wtype`
 
 ### Run in development
 

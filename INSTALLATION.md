@@ -57,7 +57,7 @@ sudo apt install -y wtype
 sudo apt install -y \
   libwebkit2gtk-4.1-dev \
   libgtk-3-dev \
-  libappindicator3-dev \
+  libayatana-appindicator3-dev \
   librsvg2-dev \
   wtype
 
